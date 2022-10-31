@@ -53,3 +53,7 @@ const init = async () => {
 };
 
 ```
+
+## MongoDB Compass
+
+![mongodb_compass](compass.png 'compass')
