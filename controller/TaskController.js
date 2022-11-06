@@ -1,50 +1,74 @@
 const taskModel = require('./../models/taskModel');
+const wrapper = require('./../middleware/wrapper');
+const { createCustomError } = require('../error/CustomError');
 
-const getAllUsers = async (req, res) => {
-  try {
-    const users = await taskModel.find({});
-    console.log(users);
+const getAllUsers = wrapper(async (req, res) => {
+  const users = await taskModel.find({});
 
-    if (!users.length) {
-      return res
-        .status(404)
-        .json({ msg: `Here is no users, Pls add some before` });
-    }
-
-    res.status(200).json({ users });
-  } catch (err) {
-    console.log(err);
+  if (!users.length) {
+    return res
+      .status(404)
+      .json({ msg: `Here is no users, Pls add some before` });
   }
-};
 
-const createUser = async (req, res) => {
-  try {
-    const { name, completed } = req.body;
+  res.status(200).json({ users });
+});
 
-    const user = await taskModel.create({ name, completed });
+const createUser = wrapper(async (req, res) => {
+  const { name, completed } = req.body;
 
-    res.send('create user');
-  } catch (err) {
-    // console.log(err);
-    res.send('you have some error, pls fix it');
+  const user = await taskModel.create({ name, completed });
+
+  res.status(201).json({ msg: 'User created successfully', user });
+});
+
+const getSingleUser = wrapper(async (req, res, next) => {
+  const { id } = req.params;
+  const user = await taskModel.find({ _id: id });
+
+  if (!user.length) {
+    /*   const error = new Error('not found');
+    error.status = 404;
+    return next(error); */
+    return next(createCustomError('user not found', 404));
+    // throw createCustomError(`Here is no users, Pls add some before`, 404);
   }
-};
 
-const getSingleUser = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const user = await taskModel.find({ _id: id });
+  res.status(200).json({ user });
+});
 
-    console.log(user);
+const deleteUser = wrapper(async (req, res) => {
+  const { id } = req.params;
 
-    if (!user.length) {
-      return res.status(404).json({ msg: `User not found with ID: ${id}` });
-    }
+  const delUser = await taskModel.findByIdAndDelete({ _id: id });
 
-    res.status(200).json({ user });
-  } catch (err) {
-    console.log(err);
+  if (!delUser) {
+    throw new Error(`User not found with ID: ${id}`);
   }
-};
 
-module.exports = { getAllUsers, createUser, getSingleUser };
+  res.status(200).json({ msg: `User ID: ${id} deleted successfully` });
+});
+
+const updateUser = wrapper(async (req, res) => {
+  const { id } = req.params;
+  const user = req.body;
+
+  const newUser = await taskModel.findOneAndUpdate({ _id: id }, user, {
+    new: true,
+    runValidators: true,
+  });
+
+  if (!newUser) {
+    throw new Error(`User not found with ID: ${id}`);
+  }
+
+  res.status(200).json({ msg: 'User updated successfully' });
+});
+
+module.exports = {
+  getAllUsers,
+  createUser,
+  getSingleUser,
+  deleteUser,
+  updateUser,
+};

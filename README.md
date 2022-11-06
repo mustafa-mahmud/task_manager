@@ -1,6 +1,6 @@
 # Task Manager
 
-Here used _**Vanilla JS**_ , _**NodeJS**_ , _**ExpressJS**_ , _**MongoDB**_ , _**MongooseJS**_ , _**MongoDB**_ , _**Html**_ & _**Css**_
+Here used _**Vanilla JS**_ , _**NodeJS**_ , _**ExpressJS**_ , _**MongoDB**_ , _**MongooseJS**_ , _**Html**_ & _**Css**_
 
 Followe to [udemy course](www.udemy.com)
 
@@ -57,3 +57,7 @@ const init = async () => {
 ## MongoDB Compass
 
 ![mongodb_compass](compass.png 'compass')
+
+---
+
+# FINISHED
